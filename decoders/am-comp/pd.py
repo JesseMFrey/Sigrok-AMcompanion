@@ -174,8 +174,7 @@ class Decoder(srd.Decoder):
         else:
             return commands[b]
 
-    def decode_frame_byte(self,value,pos):
-
+    def decode_frame_byte(self,mosi,miso,pos):
 
         if(self.decode_state=='COMPLETE'):
             self.warn(pos,'Unexpected Data')
@@ -185,6 +184,11 @@ class Decoder(srd.Decoder):
         if(self.entry_bytes==0):
             #save start position
             self.entry_start_pos=pos[0]
+
+        if(self.decode_state=='FRAME_DECODE'):
+            value=mosi
+        else:
+            value=miso
 
 
         byte_rank=self.entry_bytes
@@ -298,4 +302,5 @@ class Decoder(srd.Decoder):
                 self.requirements_met = False
                 raise ChannelError('Both MISO and MOSI pins required.')
 
-            self.decode_frame_byte(mosi,pos)
+            self.decode_frame_byte(mosi,miso,pos)
+
