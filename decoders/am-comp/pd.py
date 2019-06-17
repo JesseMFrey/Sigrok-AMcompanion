@@ -57,8 +57,8 @@ frame_data = [
 ]
 
 companion_setup = [
-        {'type' : 'num'         ,'name' : 'ID'      ,'bytes' : 2},
-        {'type' : 'num'         ,'name' : 'ID_INV'  ,'bytes' : 2},
+        {'type' : 'hex'         ,'name' : 'ID'      ,'bytes' : 2},
+        {'type' : 'hex'         ,'name' : 'ID_INV'  ,'bytes' : 2},
         {'type' : 'uval'        ,'name' : 'UPDATE'  ,'bytes' : 1, 'scale' : 0.01 , 'units' : 's'},
         {'type' : 'num'         ,'name' : 'TELM'    ,'bytes' : 1}
 ]
@@ -219,7 +219,10 @@ class Decoder(srd.Decoder):
                 text = f"{self.frame_entry['name']} = {value} {self.frame_entry['units']}"
             elif(self.frame_entry['type']=='num'):
                 #number, no scaling no sign
-                text = f"{self.frame_entry['name']} = {str(self.decode_value)}"
+                text = f"{self.frame_entry['name']} = {self.decode_value}"
+            elif(self.frame_entry['type']=='hex'):
+                #display value as hex
+                text = f"{self.frame_entry['name']} = {self.decode_value:#0{self.frame_entry['bytes']*2+2}X}"
             else:
                 #unknown type should not happen
                 warnings.warn(f"Unknown entry tpye {self.frame_entry['type']}")
