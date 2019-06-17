@@ -230,11 +230,9 @@ class Decoder(srd.Decoder):
                 if(self.frame_entry['name'] == 'ID'):
                     self.companion_id_start=self.entry_start_pos
                     self.companion_id=self.decode_value
-                    print(f"Saving companion ID : {self.companion_id}")
                 elif(self.frame_entry['name'] == 'ID_INV'):
                     if(self.companion_id != (0xFFFF ^ self.decode_value)):
                         self.warn((self.companion_id_start,pos[1]),'Companion ID mismatch')
-                        print('{:#04X} does not match {:#04X}'.format(self.companion_id, (0xFFFF ^ self.decode_value)))
 
 
             #reset decode values
