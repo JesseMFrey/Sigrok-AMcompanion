@@ -225,6 +225,18 @@ class Decoder(srd.Decoder):
                 warnings.warn(f"Unknown entry tpye {self.frame_entry['type']}")
                 text = 'Internal Error'
 
+            #check for ID and inverted ID for mismatch
+            if(self.decode_state=='SETUP_DECODE'):
+                if(self.frame_entry['name'] == 'ID'):
+                    self.companion_id_start=self.entry_start_pos
+                    self.companion_id=self.decode_value
+                    print(f"Saving companion ID : {self.companion_id}")
+                elif(self.frame_entry['name'] == 'ID_INV'):
+                    if(self.companion_id != (0xFFFF ^ self.decode_value)):
+                        self.warn((self.companion_id_start,pos[1]),'Companion ID mismatch')
+                        print('{:#04X} does not match {:#04X}'.format(self.companion_id, (0xFFFF ^ self.decode_value)))
+
+
             #reset decode values
             self.decode_value=0
             self.entry_bytes=0
@@ -253,12 +265,6 @@ class Decoder(srd.Decoder):
                         self.decode_state='COMPLETE'
             elif(self.decode_state=='SETUP_DECODE'):
                 self.putp((self.entry_start_pos,pos[1]),self.ann_rx,text)
-                if(self.frame_entry['name'] == 'ID'):
-                    self.companion_id_start=self.entry_start_pos
-                    self.companion_id=self.decode_value
-                elif(self.frame_entry['name'] == 'ID_INV'):
-                    if(self.companion_id != (0xFFFF ^ self.decode_value)):
-                        self.warn((self.companion_id_start,pos[1]),'Companion ID mismatch')
                 try:
                     self.frame_entry=next(self.entry_itr)
                 except StopIteration:
